@@ -7,7 +7,7 @@
         <div class="filter-nav">
           <span class="sortby">Sort by:</span>
           <a href="javascript:void(0)" class="default cur">Default</a>
-          <a href="javascript:void(0)" class="price">Price <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
+          <a href="javascript:void(0)" class="price" @click="sortGoods">Price <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
           <a href="javascript:void(0)" class="filterby stopPop">Filter by</a>
         </div>
         <div class="accessory-result">
@@ -15,7 +15,7 @@
           <div class="filter stopPop" id="filter">
             <dl class="filter-price">
               <dt>Price:</dt>
-              <dd><a href="javascript:void(0)" :class="{'cur':priceChecked == 'all'}">All</a></dd>
+              <dd><a href="javascript:void(0)" @click="setPriceFilter('all')" :class="{'cur':priceChecked == 'all'}">All</a></dd>
               <dd v-for="(price,index) in priceFilter">
                 <a href="javascript:void(0)" @click="setPriceFilter(index)" :class="{'cur':priceChecked == index}">{{price.startPrice}} - {{price.endPrice}}</a>
               </dd>
@@ -34,10 +34,13 @@
                     <div class="name">{{item.productName}}</div>
                     <div class="price">{{item.salePrice}}</div>
                     <div class="btn-area">
-                      <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                      <a href="javascript:;" class="btn btn--m" @click="setproductId(item.productId)">加入购物车</a>
                     </div>
                   </div>
                 </li>
+                <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="20">
+                  ...
+                </div>
               </ul>
             </div>
           </div>
@@ -59,6 +62,10 @@ export default {
       GoodsList: Array,
       sortFlag: true,
       priceChecked: 'all',
+      busy: true,
+      page: 1,
+      pagesize: 8,
+      flag: false,
       priceFilter: [
         {
           startPrice: '0.00',
@@ -75,6 +82,10 @@ export default {
         {
           startPrice: '1000.00',
           endPrice: '5000.00'
+        },
+        {
+          startPrice: '2000.00',
+          endPrice: '5000.00'
         }
       ]
     }
@@ -89,26 +100,64 @@ export default {
     this.getGoodsList()
   },
   methods: {
-    getGoodsList () {
+    getGoodsList (flag) {
       let param = {
         sort: this.sortFlag ? 1 : -1,
-        priceLevel: this.priceChecked
+        priceLevel: this.priceChecked,
+        page: this.page,
+        pagesize: this.pagesize
       }
       axios.get('/goods/list', {params: param}).then((result) => {
+        console.log(result)
         let res = result.data.result
-        console.log(res)
-        this.GoodsList = res
-        // 全局赋值
+        if (result.data.status === '0') {
+//          console.log(res)
+          if (flag) {
+            console.log(res)
+//            console.log(this.GoodsList)
+            if (res) {
+              this.GoodsList = this.GoodsList.concat(res)
+            }
+            // 判断数据加载完成后截停
+            if (res.length < this.pagesize) {
+              this.busy = true
+              return
+            } else {
+              // 请求
+              this.busy = false
+            }
+          } else {
+            this.GoodsList = res
+            this.busy = false
+          }
+          // 全局赋值
+        } else {
+          alert('系统正忙')
+        }
       })
     },
     sortGoods () {
+      this.page = 1
       this.sortFlag = !this.sortFlag
       this.getGoodsList()
     },
     setPriceFilter (index) {
       console.log(index)
+      this.page = 1
       this.priceChecked = index
       this.getGoodsList()
+      this.busy = false
+    },
+    loadMore () {
+      setTimeout(() => {
+        this.page++
+        this.getGoodsList(true)
+      }, 500)
+    },
+    setproductId (id) {
+      axios.post('/goods/addCart', {productId: id}).then((result) => {
+        console.log(result)
+      })
     }
   }
 }

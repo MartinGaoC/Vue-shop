@@ -71,6 +71,7 @@
     server这里就是express写Api的地方
     server下创建一个models模型文件夹再包含一个goods.js文件
     goods文件中引入模块mongoose这里的主要功能是创建数据库表的字段
+    这个文件是一个模板
       let mongoose = require('mongoose')
       let Schema = mongoose.Schema
       #这是一个模型模型是返回的数据规则
@@ -101,6 +102,7 @@
 
             router.get('/list',function (req,res,next) {
               # 不给条件是查找所有find{}
+              sort排序方法
               let sort = req.param("sort");
               #
               let priceLevel = req.param('priceLevel');
@@ -123,6 +125,7 @@
               }
                   #.find是查询数据库的api 下面语句就是查询了数据库Goods
               let goodModel = Goods.find(param);
+              sort 语法规定传一个对象过去
               goodModel.sort({'salePrice':sort})
 
               goodModel.exec({}, function (err, docs) {
@@ -173,7 +176,7 @@
 
         解决你的问题的网址
         https://github.com/sindresorhus/awesome-nodejs
-        supervior解决每次修改都要重新启动的问题
+        supervisor解决每次修改都要重新启动的问题
            cnpm i supervisor -g
            然后server启动时用supervisor bin/www
 
