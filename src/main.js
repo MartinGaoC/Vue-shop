@@ -15,6 +15,7 @@ Vue.config.productionTip = false
 Vue.use(infiniteScroll)
 Vue.use(VueLazyLoad, {
   loading: '/static/loading/loading-spinning-bubbles.svg'
+  // loading:'/static/ime'
 })
 /* eslint-disable no-new */
 new Vue({

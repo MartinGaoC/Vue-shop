@@ -73,7 +73,7 @@ router.post("/addCart", function(req,res,next) {
       msg: '用户信息不存在'
     })
   }
-  let productId = req.body.productId;
+  var productId = req.body.productId;
 
   console.log(productId)
 
