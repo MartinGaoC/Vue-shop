@@ -16,8 +16,9 @@
         <div class="navbar-menu-container">
           <!--<a href="/" class="navbar-link">我的账户</a>-->
           <span class="navbar-link"></span>
-          <a href="javascript:void(0)" class="navbar-link">Login</a>
-          <a href="javascript:void(0)" class="navbar-link">Logout</a>
+          <span v-text="nickName" v-if="nickName"></span>
+          <a href="javascript:void(0)" class="navbar-link" v-if="!nickName" @click="loginModalFlag = true">Login</a>
+          <a href="javascript:void(0)" class="navbar-link" @click="logout">Logout</a>
           <div class="navbar-cart-container">
             <span class="navbar-cart-count"></span>
             <a class="navbar-link navbar-cart-link" href="/#/cart">
@@ -29,11 +30,95 @@
         </div>
       </div>
     </div>
+    <!-- 登录框 -->
+      <div class="md-modal modal-msg md-modal-transition" :class="{'md-show':loginModalFlag}">
+        <div class="md-modal-inner">
+          <div class="md-top">
+            <div class="md-title">login in</div>
+            <button class="md-close">Close</button>
+          </div>
+          <div class="md-content">
+            <div class="confirm-tips">
+              <div class="error-wrap" v-show="errorTip">
+                <span class="error error-show">用户名或密码错误</span>
+              </div>
+              <ul>
+                <li class="regi_form_input">
+                  <input type="text" tabindex="1" name="loginname" placeholder="User Name" data-type="loginname" v-model="userName" class="regi_login_input regi_login_input_left" >
+                </li>
+                <li class="regi_form_input noMargin">
+                  <i class="icon IconPwd"></i>
+                  <input type="password" tabindex="2" name="password" placeholder="Password" v-model="userPwd" class="regi_login_input regi_login_input_left login-input-no input_text" @keyup.enter="login" >
+                </li>
+              </ul>
+
+            </div>
+            <div class="login-wrap">
+              <a href="javascript:;" class="btn-login" @click="login">登录</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--遮罩层-->
+      <div class="md-overlay" v-if="loginModalFlag" @click="loginModalFlag = false">
+      </div>
   </header>
 </template>
 <script>
+import axios from 'axios'
 export default {
-  name: 'Header'
+  name: 'Header',
+  data () {
+    return {
+      loginModalFlag: false,
+      userName: '',
+      userPwd: '',
+      errorTip: false,
+      nickName: ''
+    }
+  },
+  mounted: function () {
+    this.checkLogin()
+  },
+  methods: {
+    checkLogin () {
+      axios.get('/users/checkLogin').then((response) => {
+        let res = response.data
+        if (res.status === 0) {
+          this.nickName = res.result
+        }
+      })
+    },
+    login () {
+      // 获取表单用户名和密码给后端接口
+      if (!this.userName || !this.userPwd) {
+        this.errorTip = true
+        return false
+      }
+      axios.post('/users/login', {
+        userName: this.userName,
+        userPwd: this.userPwd
+      }).then((response) => {
+        let res = response.data
+        console.log(res)
+        if (res.status === '0') {
+          this.loginModalFlag = false
+          this.nickName = res.result.userName
+        } else {
+          this.errorTip = true
+        }
+      })
+    },
+    logout () {
+      axios.post('/users/logout').then((response) => {
+        console.log(response)
+        let res = response.data
+        if (res.status === '0') {
+          this.nickName = ''
+        }
+      })
+    }
+  }
 }
 </script>
 <style lang="css" ></style>

@@ -45,6 +45,26 @@
             </div>
           </div>
         </div>
+        <!-- 模态框 -->
+        <div class="md-modal modal-msg md-modal-transition" :class="{'md-show':mdShow}">
+          <div class="md-modal-inner">
+            <div class="md-top">
+              <div class="md-title">信息提示</div>
+              <button class="md-close">Close</button>
+            </div>
+            <div class="md-content">
+              <div class="confirm-tips">
+                <div class="error-wrap">
+                  <span class="error error-show">请先登录否则无法加入购物车</span>
+                </div>
+              </div>
+              <div class="login-wrap">
+                <a href="javascript:;" class="btn-login" @click="closeModal">关闭</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="md-overlay" v-if="mdShow"></div>
       </div>
     </div>
   <nav-footer></nav-footer>
@@ -66,6 +86,7 @@ export default {
       page: 1,
       pagesize: 8,
       flag: false,
+      mdShow: false,
       priceFilter: [
         {
           startPrice: '0.00',
@@ -154,10 +175,19 @@ export default {
         this.getGoodsList(true)
       }, 500)
     },
-    setproductId (id) {
-      axios.post('/goods/addCart', {productId: id}).then((result) => {
-        console.log(result)
+    setproductId (productId) {
+      axios.post('/goods/addCart', {productId: productId}).then((response) => {
+        let res = response.data
+        console.log(res)
+        if (res.status === '1') {
+          this.mdShow = true
+        } else {
+          alert('加入购物车成功')
+        }
       })
+    },
+    closeModal () {
+      this.mdShow = false
     }
   }
 }

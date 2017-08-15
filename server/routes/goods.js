@@ -4,6 +4,7 @@ let mongoose = require('mongoose')
 let Goods = require('../models/goods')
 let User = require('../models/user');
 
+
 // 连接数据库
 mongoose.connect('mongodb://60.205.190.155:27017/shop-youhuo')
 // 连接成功时触发
@@ -63,9 +64,17 @@ router.get('/list',function (req,res,next) {
 
 // 加入购物车API
 
-router.post("/addCart", function (req,res,next) {
-  let userId = '100000077';
-  let productId = req.param('productId');
+router.post("/addCart", function(req,res,next) {
+  if (req.cookies.userId) {
+    var userId = req.cookies.userId
+  } else {
+    res.json({
+      status: '1',
+      msg: '用户信息不存在'
+    })
+  }
+  let productId = req.body.productId;
+
   console.log(productId)
 
   User.findOne({userId:userId}, function (err,userDoc) {
@@ -75,7 +84,7 @@ router.post("/addCart", function (req,res,next) {
     let goodItem = '';
     userDoc.cartList.forEach(function (item) {
       // 如果购物车里面的ID和现在要添加的商品id一样就让他productNum 加1
-      if (item.productId == productId) {
+      if (item.productId === productId) {
         // 此时把相同的产品赋值变量
         goodItem = item
         item.productNum++;

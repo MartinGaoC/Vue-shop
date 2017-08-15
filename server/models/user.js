@@ -3,7 +3,7 @@ let Schema = mongoose.Schema
 let userSchema = new Schema({
   "userId": String,
   "userName": String,
-  "userPwd": Number,
+  "userPwd": String,
   "orderList": Array,
   "cartList": [
     {
