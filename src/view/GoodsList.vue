@@ -69,7 +69,7 @@
 <script>
 import NavHeader from '@/components/Header'
 import NavFooter from '@/components/Footer'
-import NavBread from '@/components/Navbread'
+import NavBread from '@/components/NavBread'
 import Modal from '@/components/Modal'
 import axios from 'axios'
 export default {
