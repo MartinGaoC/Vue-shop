@@ -40,7 +40,8 @@
       }
       进行导出
 
-  怎么去掉eslint规范（不建议使用）
+  在build/webpack.base.conf.js文件里
+  怎么去掉eslint规范（不建议去掉）
     ```
       module: {
         rules: [
@@ -56,7 +57,7 @@
           // },
     ```
 
-  解决识别css扩展文件
+  解决识别css扩展文件  @是src的缩写
     在build/webpack.base.conf.js文件里
     extensions: ['.js', '.vue', '.json','.css'],
 第二步

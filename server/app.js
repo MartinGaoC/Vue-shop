@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var goods = require('./routes/goods');
+
 var app = express();
 
 // view engine setup
@@ -21,47 +22,53 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-// 访问拦截 就是所有访问都走这里
-app.use(function (req,res,next) {
-  if (req.cookies.userId) {
-    next()
-  } else {
-    if (
-      // 这里是白名单
-      req.originalUrl == '/users/login'
-      || req.originalUrl == '/users/logout'
-      || req.path == '/goods/list'
-    ){
-      next()
-    } else {
-      res.json({
-        status: '1',
-        msg: '当前未登录',
-        result: ''
-      })
+
+// 访问拦截 就是所有访问都走这个逻辑
+app.use(function(req,res,next){
+    if(req.cookies.userId){
+        next();
+    }else{
+        if(
+            // 加入白名单
+        req.originalUrl == '/users/login'
+        || req.originalUrl == '/users/logout'
+        || req.path == '/goods/list'
+        ){
+            // console.log(req);
+            // console.log(req);
+            next();
+        }else{
+            res.json({
+                status:'1',
+                msg:'当前未登录',
+                result:''
+            })
+        }
     }
-  }
 })
+
 
 app.use('/', index);
 app.use('/users', users);
 app.use('/goods', goods);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
+

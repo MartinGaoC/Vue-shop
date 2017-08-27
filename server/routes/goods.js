@@ -6,7 +6,7 @@ let User = require('../models/user');
 
 
 // 连接数据库
-mongoose.connect('mongodb://60.205.190.155:27017/shop-youhuo')
+mongoose.connect('mongodb://60.205.190.155:27017/shop')
 // 连接成功时触发
 mongoose.connection.on('connected', function () {
   console.log('Mongodb connected success')
